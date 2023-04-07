@@ -20,9 +20,9 @@ with h5py.File('data/data.hdf5', 'w') as f:
     group = f.create_group('Dataset')
     train_dataset = group.create_dataset('train', data=train_data, dtype=train_data.dtype)
     test_dataset = group.create_dataset('test', data=test_data, dtype=test_data.dtype)
-    f.create_group('Member1 name')
-    f.create_group('Member2 name')
-    f.create_group('Member3 name')
+    f.create_group('Bertan')
+    f.create_group('Conrad')
+    f.create_group('Ethan')
 
     print(f.keys())
 
