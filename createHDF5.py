@@ -2,33 +2,49 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import h5py
 import numpy as np
+import os
 
-##make sure to change the name of the raw data file
-df = pd.read_csv('raw_data/<raw-data-name>.csv')
+def create_dataset(type, file, group):
+    df = pd.read_csv(file)          # 'raw_data\walk\walk_combined_shuffled.csv'
 
-train_data, test_data = train_test_split(df, test_size=0.1, random_state=42, shuffle=False)
-train_data.to_csv('data/train_data.csv', header=False, index=False)
-test_data.to_csv('data/test_data.csv', header=False, index=False)
+    train_filename = 'data/' + type + '_train_data.csv'
+    test_filename = 'data/' + type + '_test_data.csv'
 
-train_data = np.loadtxt('data/train_data.csv', delimiter=',')
-test_data = np.loadtxt('data/test_data.csv', delimiter=',')
+    train_data, test_data = train_test_split(df, test_size=0.1, random_state=42, shuffle=False)
+    train_data.to_csv(train_filename, header=False, index=False)
+    test_data.to_csv(test_filename, header=False, index=False)
 
-hdf5_file = h5py.File("data/data.hdf5", "w")
-hdf5_file.close()
+    train_data = np.loadtxt(train_filename, delimiter=',')
+    test_data = np.loadtxt(test_filename, delimiter=',')
+    
+    group.create_dataset(type+'_train', data=train_data)
+    group.create_dataset(type+'_test', data=test_data)
 
-with h5py.File('data/data.hdf5', 'w') as f:
-    group = f.create_group('Dataset')
-    train_dataset = group.create_dataset('train', data=train_data, dtype=train_data.dtype)
-    test_dataset = group.create_dataset('test', data=test_data, dtype=test_data.dtype)
-    f.create_group('Bertan')
-    f.create_group('Conrad')
-    f.create_group('Ethan')
+def store_member_data(group, name):
+    os.chdir('raw_data\jump')
+    files = os.listdir()
+    for file in files:
+        if name in file:
+            parsed_file = np.loadtxt(file, delimiter=',', skiprows=1)
+            group.create_dataset(file[:-4], data=parsed_file)
+    os.chdir('..')
+    os.chdir('walk')
+    files = os.listdir()
+    for file in files:
+        if name in file:
+            parsed_file = np.loadtxt(file, delimiter=',', skiprows=1)
+            group.create_dataset(file[:-4], data=parsed_file)
 
-    print(f.keys())
 
-with h5py.File('data/data.hdf5', 'r') as f:
-    dataset = f['Dataset/test']
-    column_data = dataset[:, 0]
-    print(column_data)
+f = h5py.File('data\data.hdf5','w')
+dataset = f.create_group("dataset")
+conrad = f.create_group("conrad")
+bertan = f.create_group("bertan")
+ethan = f.create_group("ethan")
 
+create_dataset('walk', 'raw_data\walk\walk_combined_shuffled.csv', dataset)
+create_dataset('jump', 'raw_data\jump\jump_combined_shuffled.csv', dataset)
 
+store_member_data(conrad, 'conrad')
+# store_member_data(bertan, 'bertan')
+# store_member_data(ethan, 'ethan')
