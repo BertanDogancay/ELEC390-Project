@@ -1,7 +1,9 @@
 # 390
 
-How to run:
-1. run combine.py
-2. run shuffle.py
-3. run createHDF5.py
-4. run model.py (This file runs a sliding moving average, feature extracts, normalizes, and runs a linear regression model)
+How to run for yourself:
+1. Delete everything inside `data` folder
+2. Put jump data in `raw_data\jump` and walk data in `raw_data\walk`
+3. Run `combine.py`
+4. Run `shuffle.py`
+5. Run `createHDF5.py`
+6. Run `model.py`

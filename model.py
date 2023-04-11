@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, recall_score
+import pickle
 
 
 def feature_extract(df):
@@ -73,3 +74,7 @@ print("Accuracy:", accuracy)
 
 recall = recall_score(y_test, y_pred) 
 print('recall is: ', recall) 
+
+# save the model to a file
+filename = 'logistic_regression_model.sav'
+pickle.dump(model, open(filename, 'wb'))
