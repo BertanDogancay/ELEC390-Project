@@ -1,48 +1,75 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, recall_score
-from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegression
-from sklearn.inspection import DecisionBoundaryDisplay
-from sklearn.decomposition import PCA
+from sklearn.metrics import accuracy_score, recall_score
 
 
+def feature_extract(df):
+    df['max_x'] = df['Linear Acceleration x (m/s^2)'].rolling(window=window_size).max()
+    df['max_y'] = df['Linear Acceleration y (m/s^2)'].rolling(window=window_size).max()
+    df['max_z'] = df['Linear Acceleration z (m/s^2)'].rolling(window=window_size).max()
+    df['max_abs'] = df['Absolute acceleration (m/s^2)'].rolling(window=window_size).max()
 
-# reading the dataset and binarizing the labels 
-train_set = pd.read_csv('data\\train.csv')
-test_set = pd.read_csv('data\\test.csv')
+    df['min_x'] = df['Linear Acceleration x (m/s^2)'].rolling(window=window_size).min()
+    df['min_y'] = df['Linear Acceleration y (m/s^2)'].rolling(window=window_size).min()
+    df['min_z'] = df['Linear Acceleration z (m/s^2)'].rolling(window=window_size).min()
+    df['min_abs'] = df['Absolute acceleration (m/s^2)'].rolling(window=window_size).min()
 
-train_data = train_set.iloc[:,2:10]
-train_labels = train_set.iloc[:,10]
+    df['mean_x'] = df['Linear Acceleration x (m/s^2)'].rolling(window=window_size).mean()
+    df['mean_y'] = df['Linear Acceleration y (m/s^2)'].rolling(window=window_size).mean()
+    df['mean_z'] = df['Linear Acceleration z (m/s^2)'].rolling(window=window_size).mean()
+    df['mean_abs'] = df['Absolute acceleration (m/s^2)'].rolling(window=window_size).mean()
 
-test_data = test_set.iloc[:,2:10]
-test_labels = test_set.iloc[:,10]
+    df['variance_x'] = df['Linear Acceleration x (m/s^2)'].rolling(window=window_size).var()
+    df['variance_y'] = df['Linear Acceleration y (m/s^2)'].rolling(window=window_size).var()
+    df['variance_z'] = df['Linear Acceleration z (m/s^2)'].rolling(window=window_size).var()
+    df['variance_abs'] = df['Absolute acceleration (m/s^2)'].rolling(window=window_size).var()
 
-print(train_data)
-print(test_data)
-print(train_labels)
-print(test_labels)
+    df.dropna(inplace=True)
+
+# Use an SMA on the training data
+
+df_train = pd.read_csv('data\\train_data.csv')
+df_test = pd.read_csv('data\\test_data.csv')
+window_size = 5
+
+sma = df_train.iloc[:,0:-1].rolling(window_size).mean()
+sma['label'] = df_train.iloc[:,-1]
+sma = sma.dropna()
 
 
-# Define a Standard Scaler to normalize inputs 
-scaler = StandardScaler() 
-# # defining the classifier and the pipeline 
-l_reg = LogisticRegression(max_iter=10000) 
-clf = make_pipeline(StandardScaler(), l_reg) 
-# training 
-clf.fit(train_data, train_labels) 
+# Do feature extraction on train and test data
+window_size = 500
 
-# obtaining the predictions and the probabilities 
-y_pred = clf.predict(test_data) 
-y_clf_prob = clf.predict_proba(test_data) # y_clf_prob[:, 1] is the probability of the positive class for each sample 
-print('y_pred is:', y_pred) 
-print('y_clf_prob is:', y_clf_prob) 
+feature_extract(sma)
+feature_extract(df_test)
 
-# obtaining the classification accuracy 
-acc = accuracy_score(test_labels, y_pred) 
-print('accuracy is ', acc) 
-# obtaining the classification recall 
-recall = recall_score(test_labels, y_pred) 
+# Normalize the data
+# Separate input features from target variable
+X_train = sma.drop('label', axis=1)
+X_test = df_test.drop('label', axis=1)
+
+# Normalize input features and store them
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.fit_transform(X_test)
+
+# Separate the target variable from the normalized input features
+y_train = sma['label']
+y_test = df_test['label']
+
+
+# Train a logistic regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Evaluate the model on the test set
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+recall = recall_score(y_test, y_pred) 
 print('recall is: ', recall) 
