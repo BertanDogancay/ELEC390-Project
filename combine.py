@@ -1,37 +1,42 @@
 import os
 import pandas as pd
 
+def combine_csv(directory):
+    # Set the directory containing the files
 
+    # Get a list of all the files in the directory
+    file_list = os.listdir(directory)
 
+    # Initialize an empty list to store the dataframes
+    df_list = []
 
-def combine_csv(folder):
-    files = os.listdir()
-    time_counter = 0
-    times_to_add = []
-    dataset_array = []
+    # Loop through each file in the directory and append the dataframe to the list
+    for file in file_list:
+        if file.endswith('.csv'):  # Only consider csv files
+            file_path = os.path.join(directory, file)
+            df = pd.read_csv(file_path)
+            if len(df_list) > 0:  # If this is not the first file
+                df["Time (s)"] += df_list[-1]["Time (s)"].iloc[-1] + 1  # Add time offset
+            df_list.append(df)
 
-    for i in range(0, len(files)-1):
-        # get last recorded time from dataset
-        dataset = pd.read_csv(files[i])
-        last_time = dataset["Time (s)"].iloc[-1]
-        time_counter += last_time
-        times_to_add.append(time_counter)
+    # Concatenate all the dataframes in the list
+    concatenated_df = pd.concat(df_list, ignore_index=True)
 
-    dataset = pd.read_csv(files[0])
-    dataset_array.append(dataset)
+    # Add labels to the dataframe 0 for walk 1 for jump
+    if 'walk' in directory:
+        filename = 'walk_data.csv'
+        concatenated_df['label'] = 0
+    elif 'jump' in directory:
+        filename = 'jump_data.csv'
+        concatenated_df['label'] = 1
+    elif 'data' in directory:
+        filename = 'combined_data.csv'
+    else:
+        print('Something went wrong')
 
-    for i in range(1, len(files)):
-        dataset = pd.read_csv(files[i])
-        dataset.iloc[:,0] += times_to_add[i-1]
-        dataset_array.append(dataset)
+    # Export the concatenated dataframe as csv
+    concatenated_df.to_csv('data\\'+filename, index=False)
 
-    combined = pd.concat(dataset_array)
-
-    combined.to_csv(folder+'_combined.csv', index=False)
-
-os.chdir('raw_data')
-folders = os.listdir()
-for folder in folders:
-    os.chdir(folder)
-    combine_csv(folder)
-    os.chdir('..')
+combine_csv('raw_data\jump')
+combine_csv('raw_data\walk')
+combine_csv('data')

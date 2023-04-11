@@ -7,7 +7,7 @@ import os
 import random
 
 
-shuffle_interval = 5
+
 
 
 
@@ -43,16 +43,9 @@ def shuffle_csv(filename, interval):
 
 
 
-os.chdir('raw_data')
-folders = os.listdir()
-for folder in folders:
-    os.chdir(folder)
-    files = os.listdir()
-    for file in files:
-        if 'combined' in file:
-            print(file)
-            shuffle_csv(file, shuffle_interval)
-    os.chdir('..')
+shuffle_interval = 5
+
+shuffle_csv('data\combined_data.csv', shuffle_interval)
 
 
 
