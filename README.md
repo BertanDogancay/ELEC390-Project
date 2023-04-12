@@ -7,3 +7,4 @@ How to run for yourself:
 4. Run `shuffle.py`
 5. Run `createHDF5.py`
 6. Run `model.py`
+7. Run `predict.py`
