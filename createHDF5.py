@@ -43,11 +43,6 @@ test_data = np.loadtxt('data\\test_data.csv', delimiter=',', skiprows=1)
 dataset.create_dataset('train', data=train_data)
 dataset.create_dataset('test', data=test_data)
 
-
-
-
-
-
 def create_dataset(type, file, group):
     df = pd.read_csv(file)          # 'raw_data\walk\walk_combined_shuffled.csv'
 
