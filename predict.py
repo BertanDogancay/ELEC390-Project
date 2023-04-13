@@ -1,7 +1,6 @@
 import pickle
 from model import feature_extract
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
@@ -18,6 +17,7 @@ def predict(filename):
     window_size = 50
 
     feature_extract(X_test)
+    
     X_test = X_test.iloc[:,5:]
 
     # # normalize input features and store them
@@ -34,5 +34,4 @@ def predict(filename):
     df_output.to_csv('output.csv', index=False)
 
 # put a csv as filename to predict labels and output csv
-predict('jumptest.csv')
-
+# predict('jumptest.csv')
