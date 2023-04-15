@@ -19,7 +19,7 @@ class Worker(QThread):
         options.add_argument('--headless')
         driver = webdriver.Chrome(options=options)
 
-        url = "http://192.168.2.10:8080"
+        url = "http://10.216.73.58:8080"
         driver.get(url)
 
         div_element = driver.find_element(value="viewSelectorBar")

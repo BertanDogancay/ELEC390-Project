@@ -64,4 +64,4 @@ def create_dataset(type, file, group):
 
 store_member_data(conrad, 'conrad')
 store_member_data(bertan, 'bertan')
-# store_member_data(ethan, 'ethan')
+store_member_data(ethan, 'ethan')
