@@ -6,5 +6,6 @@ How to run for yourself:
 3. Run `combine.py`
 4. Run `shuffle.py`
 5. Run `createHDF5.py`
-6. Run `model.py`
-7. Run `predict.py`
+6. Run `visualisation.py`
+7. Run `model.py`
+8. Run `predict.py`
